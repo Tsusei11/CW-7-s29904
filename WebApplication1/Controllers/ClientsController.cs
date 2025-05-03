@@ -12,6 +12,7 @@ public class ClientsController(IDbService dbService) : ControllerBase
 {
     [HttpGet]
     [Route("{id}/trips")]
+    // Zwraca wszystkie wycieczki klienta lub kod 404 w przypadku braku klientu lub zarejestrowanych wycieczek dla niego
     public async Task<IActionResult> GetClientsTrips([FromRoute] int id)
     {
         try
@@ -25,6 +26,7 @@ public class ClientsController(IDbService dbService) : ControllerBase
     }
 
     [HttpPost]
+    // Dodaje klienta do bazy
     public async Task<IActionResult> AddClient([FromBody] ClientAddDTO body)
     {
         var client = await dbService.AddClientAsync(body);
@@ -33,6 +35,7 @@ public class ClientsController(IDbService dbService) : ControllerBase
 
     [HttpPut]
     [Route("{clientId}/trips/{tripId}")]
+    // Rejestruje klienta na wycieczke
     public async Task<IActionResult> AddTripToClient([FromRoute] int clientId, [FromRoute] int tripId)
     {
         try
@@ -52,6 +55,7 @@ public class ClientsController(IDbService dbService) : ControllerBase
 
     [HttpDelete]
     [Route("{clientId}/trips/{tripId}")]
+    // Anuluje rejestracje klienta na wycieczke
     public async Task<IActionResult> RemoveTripFromClient([FromRoute] int clientId, [FromRoute] int tripId)
     {
         try

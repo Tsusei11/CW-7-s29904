@@ -9,6 +9,7 @@ namespace WebApplication1.Controllers;
 public class TripsController(IDbService dbService) : ControllerBase
 {
     [HttpGet]
+    // Zwraca wszystkie wycieczki wraz z infromacja o krajach
     public async Task<IActionResult> GetTripsAsync()
     {
         return Ok(await dbService.GetTripsAsync());

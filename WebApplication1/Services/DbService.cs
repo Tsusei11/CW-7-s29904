@@ -26,6 +26,7 @@ public class DbService (IConfiguration configuration) : IDbService
         var result = new List<TripGetDTO>();
         
         await using var connection = new SqlConnection(_connectionString);
+        // Zwraca szczegoly kazdej wycieczki
         const string sql = "SELECT IdTrip, Name, Description, DateFrom, DateTo, MaxPeople FROM Trip";
         await using var command = new SqlCommand(sql, connection);
         
@@ -56,6 +57,7 @@ public class DbService (IConfiguration configuration) : IDbService
         var result = new List<RegisteredTripGetDTO>();
         
         await using var connection = new SqlConnection(_connectionString);
+        // Zwraca szczegoly wycieczek na ktore jest zarejestrowany klient o podanym id
         const string sql =
             @"SELECT T.IdTrip, T.Name, T.Description, T.DateFrom, T.DateTo, T.MaxPeople, C.RegisteredAt, C.PaymentDate FROM Trip T
                              JOIN Client_Trip C on T.IdTrip = C.IdTrip
@@ -96,6 +98,7 @@ public class DbService (IConfiguration configuration) : IDbService
     public async Task<Client> AddClientAsync(ClientAddDTO client)
     {
         await using var connection = new SqlConnection(_connectionString);
+        // Dodaje do bazy nowego klienta, zwraca jego id
         const string sql = @"INSERT INTO Client (FirstName, LastName, Email, Telephone, Pesel) 
                             VALUES (@FirstName, @LastName, @Email, @Telephone, @Pesel); SELECT SCOPE_IDENTITY()";
         await using var command = new SqlCommand(sql, connection);
@@ -131,6 +134,7 @@ public class DbService (IConfiguration configuration) : IDbService
             throw new MaxMembersReachedException("Maximum of trip members has been reached");
         
         await using var connection = new SqlConnection(_connectionString);
+        // Rejestruje klienta o podanym id na wycieczke o podanym id
         const string sql = "INSERT INTO Client_Trip (IdClient, IdTrip, RegisteredAt) VALUES (@clientId, @TripId, @RegisteredAt)";
         await using var command = new SqlCommand(sql, connection);
         await connection.OpenAsync();
@@ -149,6 +153,7 @@ public class DbService (IConfiguration configuration) : IDbService
             throw new NotFoundException($"Trip {tripId} not found");
         
         await using var connection = new SqlConnection(_connectionString);
+        // Usuwa rejestracje klienta o podanym id na wycieczke o podaym id
         const string sql = "DELETE FROM Client_Trip WHERE IdTrip = @tripId AND IdClient = @clientId";
         await using var command = new SqlCommand(sql, connection);
         await connection.OpenAsync();
@@ -165,6 +170,7 @@ public class DbService (IConfiguration configuration) : IDbService
         var result = new List<CountryGetDTO>();
         
         await using var connection = new SqlConnection(_connectionString);
+        // Zwraca wszystkie kraje dla wycieczki o podanym id
         const string sql = @"SELECT Name FROM Country
                              WHERE IdCountry IN (SELECT IdCountry FROM Country_Trip WHERE IdTrip = @id)";
         await using var command = new SqlCommand(sql, connection);
@@ -185,6 +191,7 @@ public class DbService (IConfiguration configuration) : IDbService
     private async Task<bool> DoesClientExistAsync(int clientId)
     {
         await using var connection = new SqlConnection(_connectionString);
+        // Sprawdza czy istnieje klient o podanym id
         const string sql = "SELECT 1 FROM Client WHERE IdClient = @clientId";
         await using var command = new SqlCommand(sql, connection);
         await connection.OpenAsync();
@@ -197,6 +204,7 @@ public class DbService (IConfiguration configuration) : IDbService
     private async Task<int> GetCurrentNumberOfTripMembersAsync(int tripId)
     {
         await using var connection = new SqlConnection(_connectionString);
+        // Zwraca liczbe klientow ktore sa obecnie zarejestrowane na wycieczke o podanym id
         const string sql = @"SELECT COUNT(1) FROM Client_Trip WHERE IdTrip = @tripId";
         await using var command = new SqlCommand(sql, connection);
         await connection.OpenAsync();
